@@ -1,4 +1,4 @@
-package your.package
+package com.example.volumelock
 
 import android.content.BroadcastReceiver
 import android.content.Context
