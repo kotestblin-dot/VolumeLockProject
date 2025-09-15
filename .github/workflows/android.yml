@@ -16,14 +16,20 @@ jobs:
           java-version: '17'
 
       # Правильные параметры для setup-android@v3
+
+
       - name: Install Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          accept-android-sdk-licenses: true
-          packages: |
-            platform-tools
-            platforms;android-34
-            build-tools;34.0.0
+  uses: android-actions/setup-android@v3
+  with:
+    cmdline-tools-version: latest
+    accept-android-sdk-licenses: true
+    packages: platform-tools platforms;android-34 build-tools;34.0.0
+
+- name: Ensure SDK packages present
+  run: |
+    yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" \
+      "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+
 
       # Чтобы AGP точно увидел путь к SDK
       - name: Create local.properties with SDK path
