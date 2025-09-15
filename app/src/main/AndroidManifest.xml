@@ -1,4 +1,6 @@
-<manifest package="your.package" xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest package="com.example.volumelock"
+
+ xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
