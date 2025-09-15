@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.volumelock"
-    compileSdk = 34   // <--- ОБЯЗАТЕЛЬНО!
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.volumelock"
@@ -17,7 +17,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // минификация по умолчанию ОТКЛЮЧЕНА, строку isMinifyEnabled удалили
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -29,9 +29,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+    kotlinOptions { jvmTarget = "17" }
 }
 
 dependencies {
