@@ -1,4 +1,5 @@
-package your.package
+package com.example.volumelock
+
 
 import android.app.NotificationManager
 import android.content.Context
