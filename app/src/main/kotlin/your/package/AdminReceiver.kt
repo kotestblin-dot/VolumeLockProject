@@ -1,4 +1,4 @@
-package your.package
+package com.example.volumelock
 
 import android.app.admin.DeviceAdminReceiver
 import android.content.Context
