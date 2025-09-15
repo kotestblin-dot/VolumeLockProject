@@ -15,27 +15,25 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # Правильные параметры для setup-android@v3
-
-
+      # Установка Android SDK
       - name: Install Android SDK
-  uses: android-actions/setup-android@v3
-  with:
-    cmdline-tools-version: latest
-    accept-android-sdk-licenses: true
-    packages: platform-tools platforms;android-34 build-tools;34.0.0
+        uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: latest
+          accept-android-sdk-licenses: true
+          packages: platform-tools platforms;android-34 build-tools;34.0.0
 
-- name: Ensure SDK packages present
-  run: |
-    yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" \
-      "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+      # Доп. шаг — докачать пакеты вручную (на всякий случай)
+      - name: Ensure SDK packages present
+        run: |
+          yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" \
+            "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
-
-      # Чтобы AGP точно увидел путь к SDK
+      # local.properties, чтобы Gradle видел SDK
       - name: Create local.properties with SDK path
         run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
 
-      # Установим Gradle без wrapper
+      # Установка Gradle 8.7 через SDKMAN
       - name: Install Gradle 8.7 (SDKMAN)
         run: |
           curl -s "https://get.sdkman.io" | bash
@@ -43,11 +41,13 @@ jobs:
           sdk install gradle 8.7
           gradle -v
 
+      # Сборка APK
       - name: Build Debug APK
         run: |
           source "$HOME/.sdkman/bin/sdkman-init.sh"
           gradle :app:assembleDebug
 
+      # Выгрузка apk как артефакт
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
