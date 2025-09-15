@@ -15,20 +15,20 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # Устанавливаем Android SDK + принимаем лицензии
       - name: Install Android SDK
         uses: android-actions/setup-android@v3
         with:
-          # Можно менять версии при необходимости
           api-level: 34
           build-tools: "34.0.0"
-          components: | 
+          components: |
             platform-tools
             platforms;android-34
             build-tools;34.0.0
 
-      # Ставим Gradle 8.7 без wrapper
-      - name: Install Gradle (SDKMAN)
+      - name: Create local.properties with SDK path
+        run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+
+      - name: Install Gradle 8.7 (no wrapper)
         run: |
           curl -s "https://get.sdkman.io" | bash
           source "$HOME/.sdkman/bin/sdkman-init.sh"
