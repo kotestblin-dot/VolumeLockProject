@@ -1,24 +1,22 @@
 package com.example.volumelock
 
-
+import android.Manifest
 import android.app.NotificationManager
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.LinearLayoutCompat
-
-import android.Manifest
-import android.content.pm.PackageManager
-import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-
 
 class MainActivity : ComponentActivity() {
 
@@ -59,10 +57,25 @@ class MainActivity : ComponentActivity() {
         dpm = getSystemService(DEVICE_POLICY_SERVICE) as DevicePolicyManager
         admin = ComponentName(this, AdminReceiver::class.java)
 
+        // Android 13+ — запрос разрешения на уведомления
+        if (Build.VERSION.SDK_INT >= 33) {
+            val granted = ContextCompat.checkSelfPermission(
+                this, Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+            if (!granted) {
+                ActivityCompat.requestPermissions(
+                    this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1001
+                )
+            }
+        }
+
         btnAdmin.setOnClickListener {
             val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
                 putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, admin)
-                putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Требуется для защиты приложения от удаления и жёсткой фиксации громкости.")
+                putExtra(
+                    DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                    "Требуется для защиты приложения от удаления и жёсткой фиксации громкости."
+                )
             }
             adminRequest.launch(intent)
         }
@@ -75,7 +88,15 @@ class MainActivity : ComponentActivity() {
         }
 
         btnStart.setOnClickListener {
-            startForegroundService(Intent(this, VolumeLockService::class.java))
+            try {
+                startForegroundService(Intent(this, VolumeLockService::class.java))
+            } catch (e: Exception) {
+                Toast.makeText(
+                    this,
+                    "Не удалось запустить сервис. Разрешите уведомления и попробуйте снова.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
         }
 
         btnStop.setOnClickListener {
