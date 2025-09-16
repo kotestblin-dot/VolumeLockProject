@@ -1,12 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.volumelock">
 
-    <!-- Разрешения -->
+    <!-- Базовые разрешения -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <!-- Android 14+ требует спец-разрешения по типам foreground-сервисов -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
+
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    
 
     <application
         android:allowBackup="false"
@@ -15,33 +19,33 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true">
 
-        <!-- Экран входа (по паролю 1515) -->
+        <!-- Экран входа (пароль 1515) — LAUNCHER -->
         <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Главное Activity (без лаунчера) -->
+        <!-- Главное activity (без лаунчера) -->
         <activity
             android:name=".MainActivity"
-            android:exported="false"/>
+            android:exported="false" />
 
         <!-- Foreground-сервис -->
         <service
             android:name=".VolumeLockService"
             android:exported="false"
-            android:foregroundServiceType="mediaPlayback|connectedDevice|dataSync"/>
+            android:foregroundServiceType="mediaPlayback|connectedDevice|dataSync" />
 
         <!-- Отслеживание изменения громкости -->
         <receiver
             android:name=".VolumeChangeReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="android.media.VOLUME_CHANGED_ACTION"/>
+                <action android:name="android.media.VOLUME_CHANGED_ACTION" />
             </intent-filter>
         </receiver>
 
@@ -51,8 +55,8 @@
             android:exported="false"
             android:enabled="true">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
@@ -63,9 +67,9 @@
             android:exported="true">
             <meta-data
                 android:name="android.app.device_admin"
-                android:resource="@xml/device_admin_policies"/>
+                android:resource="@xml/device_admin_policies" />
             <intent-filter>
-                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED"/>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
         </receiver>
 
