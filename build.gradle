@@ -1,1 +1,4 @@
-// empty on purpose
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+}
