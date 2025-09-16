@@ -25,31 +25,29 @@ class MainActivity : ComponentActivity() {
 
     private val adminRequest = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ) { }
+    ) { /* no-op */ }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val tv = TextView(this).apply {
-            text = "VolumeLock: держим звук на максимуме.\n" +
-                   "1) Включите права Device Admin.\n" +
-                   "2) Дайте доступ к DND.\n" +
-                   "3) Запустите сервис."
+            text = """
+                VolumeLock — держим звук на максимуме.
+                1) Включите права Device Admin.
+                2) Дайте доступ к DND/уведомлениям.
+                3) Запустите сервис.
+            """.trimIndent()
             setPadding(40, 80, 40, 20)
         }
         val btnAdmin = Button(this).apply { text = "Включить Device Admin" }
-        val btnDnd = Button(this).apply { text = "Выдать доступ к DND" }
+        val btnDnd   = Button(this).apply { text = "Выдать доступ к DND" }
         val btnStart = Button(this).apply { text = "Запустить сервис" }
-        val btnStop = Button(this).apply { text = "Остановить сервис" }
+        val btnStop  = Button(this).apply { text = "Остановить сервис" }
 
         setContentView(
             LinearLayoutCompat(this).apply {
                 orientation = LinearLayoutCompat.VERTICAL
-                addView(tv)
-                addView(btnAdmin)
-                addView(btnDnd)
-                addView(btnStart)
-                addView(btnStop)
+                addView(tv); addView(btnAdmin); addView(btnDnd); addView(btnStart); addView(btnStop)
                 setPadding(32, 32, 32, 32)
             }
         )
@@ -57,14 +55,14 @@ class MainActivity : ComponentActivity() {
         dpm = getSystemService(DEVICE_POLICY_SERVICE) as DevicePolicyManager
         admin = ComponentName(this, AdminReceiver::class.java)
 
-        // Android 13+ — запрос разрешения на уведомления
+        // Android 13+ — спросим разрешение на уведомления (иначе foreground-сервис может упасть)
         if (Build.VERSION.SDK_INT >= 33) {
             val granted = ContextCompat.checkSelfPermission(
                 this, Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
             if (!granted) {
                 ActivityCompat.requestPermissions(
-                    this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1001
+                    this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1515
                 )
             }
         }
@@ -74,7 +72,7 @@ class MainActivity : ComponentActivity() {
                 putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, admin)
                 putExtra(
                     DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-                    "Требуется для защиты приложения от удаления и жёсткой фиксации громкости."
+                    "Нужно для защиты от удаления и жёсткой фиксации громкости."
                 )
             }
             adminRequest.launch(intent)
@@ -84,16 +82,21 @@ class MainActivity : ComponentActivity() {
             val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             if (!nm.isNotificationPolicyAccessGranted) {
                 startActivity(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
+            } else {
+                Toast.makeText(this, "Доступ к DND уже выдан", Toast.LENGTH_SHORT).show()
             }
         }
 
         btnStart.setOnClickListener {
             try {
+                // Запускаем foreground-сервис из Activity — это разрешено на Android 14/15
                 startForegroundService(Intent(this, VolumeLockService::class.java))
+                Toast.makeText(this, "Сервис запускается…", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
                 Toast.makeText(
                     this,
-                    "Не удалось запустить сервис. Разрешите уведомления и попробуйте снова.",
+                    "Не удалось запустить сервис: ${e.message ?: "ошибка"}.\n" +
+                    "Проверьте разрешение на уведомления.",
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -101,6 +104,7 @@ class MainActivity : ComponentActivity() {
 
         btnStop.setOnClickListener {
             stopService(Intent(this, VolumeLockService::class.java))
+            Toast.makeText(this, "Сервис остановлен", Toast.LENGTH_SHORT).show()
         }
     }
 }
