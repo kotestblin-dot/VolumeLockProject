@@ -4,13 +4,12 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
-
 android {
-    namespace = "your.package"
+    namespace = "com.example.volumelock"   // было "your.package"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "your.package"
+        applicationId = "com.example.volumelock"  // было "your.package"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
