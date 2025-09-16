@@ -1,9 +1,1 @@
-// Root build.gradle (минимальный)
-// AGP версии задаём в app/build.gradle.kts, поэтому здесь ничего лишнего.
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
+// empty on purpose
