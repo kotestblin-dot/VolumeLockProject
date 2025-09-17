@@ -51,17 +51,20 @@
             </intent-filter>
         </receiver>
 
-        <!-- Автозапуск после перезагрузки -->
-        <receiver
-            android:name=".BootReceiver"
-            android:exported="false"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
 
+<!-- Автозапуск после перезагрузки -->
+<receiver
+    android:name=".BootReceiver"
+    android:exported="false"
+    android:enabled="true">
+    <intent-filter>
+        <action android:name="android.intent.action.BOOT_COMPLETED"/>
+        <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED"/>
+        <action android:name="android.intent.action.USER_UNLOCKED"/>
+    </intent-filter>
+</receiver>
+
+        
         <!-- Device Admin -->
         <receiver
             android:name=".AdminReceiver"
