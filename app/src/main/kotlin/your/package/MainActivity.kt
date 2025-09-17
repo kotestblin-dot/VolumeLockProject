@@ -87,24 +87,43 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        btnStart.setOnClickListener {
-            try {
-                // Запускаем foreground-сервис из Activity — это разрешено на Android 14/15
-                startForegroundService(Intent(this, VolumeLockService::class.java))
-                Toast.makeText(this, "Сервис запускается…", Toast.LENGTH_SHORT).show()
-            } catch (e: Exception) {
-                Toast.makeText(
-                    this,
-                    "Не удалось запустить сервис: ${e.message ?: "ошибка"}.\n" +
-                    "Проверьте разрешение на уведомления.",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        }
-
-        btnStop.setOnClickListener {
-            stopService(Intent(this, VolumeLockService::class.java))
-            Toast.makeText(this, "Сервис остановлен", Toast.LENGTH_SHORT).show()
+btnStart.setOnClickListener {
+    // 1) Разрешены ли уведомления (Android 13+)?
+    if (Build.VERSION.SDK_INT >= 33) {
+        val ok = ContextCompat.checkSelfPermission(
+            this, Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+        if (!ok) {
+            ActivityCompat.requestPermissions(
+                this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1515
+            )
+            Toast.makeText(this, "Разрешите уведомления и нажмите ещё раз", Toast.LENGTH_LONG).show()
+            return@setOnClickListener
         }
     }
+
+    // 2) Не душит ли батарея (Samsung часто убивает сервисы)?
+    val pm = getSystemService(POWER_SERVICE) as android.os.PowerManager
+    val pkg = packageName
+    if (!pm.isIgnoringBatteryOptimizations(pkg)) {
+        try {
+            startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+            Toast.makeText(this, "Выберите VolumeLock → Без ограничений", Toast.LENGTH_LONG).show()
+        } catch (_: Exception) { /* ignore */ }
+        // продолжим запускать сервис — но лучше, чтобы юзер снял ограничение
+    }
+
+    try {
+        startForegroundService(Intent(this, VolumeLockService::class.java))
+        Toast.makeText(this, "Сервис запускается… Посмотри уведомление.", Toast.LENGTH_SHORT).show()
+    } catch (e: Exception) {
+        Toast.makeText(
+            this,
+            "Сервис не стартовал: ${e.message ?: "проверь уведомления и батарею"}",
+            Toast.LENGTH_LONG
+        ).show()
+    }
 }
+
+
+        
