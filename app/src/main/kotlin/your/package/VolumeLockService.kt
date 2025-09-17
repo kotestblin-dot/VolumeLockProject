@@ -46,10 +46,24 @@ class VolumeLockService : Service() {
         super.onDestroy()
     }
 
+
+    
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // Если система перезапустит сервис — продолжаем работать
         return START_STICKY
     }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+    super.onTaskRemoved(rootIntent)
+    // Попробуем перезапуститься
+    val i = Intent(applicationContext, VolumeLockService::class.java)
+    if (Build.VERSION.SDK_INT >= 26) {
+        applicationContext.startForegroundService(i)
+    } else {
+        applicationContext.startService(i)
+    }
+}
+
 
     override fun onBind(intent: Intent?): IBinder? = null
 
