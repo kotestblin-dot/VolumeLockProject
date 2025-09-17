@@ -20,7 +20,7 @@ class VolumeLockService : Service() {
     private val keepMaxRunnable = object : Runnable {
         override fun run() {
             setAllMax()
-            handler.postDelayed(this, 1000L) // раз в секунду гарантируем макс. громкость
+            handler.postDelayed(this, 300L) // раз в секунду гарантируем макс. громкость
         }
     }
 
